@@ -1,0 +1,23 @@
+lockfileVersion: '9.0'
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
+importers:
+
+  .:
+    dependencies:
+      hello-world-npm:
+        specifier: ^1.1.1
+        version: 1.1.1
+
+packages:
+
+  hello-world-npm@1.1.1:
+    resolution: {integrity: sha512-BlANCUuBixe7YT2IzCtNsSmVn6TY//X+bEUJWJpX+v8H4waUVaJ9qJiHhnu+YHqk2jrFsqQ4DioU2wD8+sNPLw==}
+    hasBin: true
+
+snapshots:
+
+  hello-world-npm@1.1.1: {}
