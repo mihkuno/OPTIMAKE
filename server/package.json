@@ -2,9 +2,10 @@
   "name": "server",
   "version": "1.0.0",
   "description": "",
-  "main": "src/main.js",
+  "main": "src/main.ts",
   "type": "commonjs",
   "scripts": {
+    "start": "npx ts-node",
     "dev": "nodemon --legacy-watch --polling-interval 500",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

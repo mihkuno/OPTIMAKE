@@ -13,7 +13,7 @@ RUN corepack enable
 RUN pnpm config set store-dir /app/.pnpm-store/v3 --global
 
 # Install global dependencies using pnpm
-RUN pnpm add -g typescript@^5.6.2 nodemon@^3.1.7
+RUN pnpm add -g typescript@^5.6.2 nodemon@^3.1.7 ts-node@^10.9.2
 
 # Set the working directory inside the container
 WORKDIR /app
