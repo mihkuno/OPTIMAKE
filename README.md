@@ -1,36 +1,98 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🚀 OptiMake
 
-## Getting Started
+### 📌 Web-Based Decision Support System for University Course Scheduling
+Leverages **Constraint Programming** with **Google's OR-Tools CP-SAT Model** to optimize course scheduling efficiently.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## 🏗️ Project Structure
+This project follows an **Atomic Project Structure Design**, ensuring modularity and maintainability.
+
+### 🧩 What is Atomic Project Structure?
+Atomic Project Structure is a **modular approach** to organizing code, inspired by Atomic Design in UI/UX. It breaks down the project into independent, reusable components that follow a hierarchical system. This structure enhances **scalability**, **reusability**, and **maintainability**.
+
+#### 📂 Folder Organization
+```
+/src
+ ├── atoms/         # Smallest reusable components (buttons, inputs, labels)
+ ├── molecules/     # Groups of atoms forming meaningful UI elements (forms, cards)
+ ├── organisms/     # Complex components containing molecules (navigation, sections)
+ ├── templates/     # Layouts combining organisms to structure the UI
+ ├── pages/         # Route-level components
+ ├── services/      # API calls, business logic
+ ├── hooks/         # Custom React hooks
+ ├── utils/         # Helper functions
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+📖 Learn more about Atomic Project Structure:
+- [Atomic Design Principles](https://bradfrost.com/blog/post/atomic-web-design/)
+- [Organizing React Projects](https://react.dev/learn#organizing-components)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🏗️ Next.js 15 Project Structure
+OptiMake is built with **Next.js 15**, which introduces **Partial Prerendering (PPR)** and improved React Server Components (RSC). The project structure follows Next.js' latest best practices:
 
-## Learn More
+#### 📂 Folder Organization (Next.js 15)
+```
+/src
+ ├── app/            # Uses Next.js App Router (new feature)
+ │   ├── layout.tsx  # Defines shared layouts
+ │   ├── page.tsx    # Default homepage
+ │   ├── loading.tsx # Suspense loading state
+ │   ├── error.tsx   # Error handling page
+ │   ├── dashboard/  # Nested routes for dashboard
+ ├── components/     # Reusable UI components
+ ├── lib/            # Server utilities (database, authentication)
+ ├── styles/        # Global styles (CSS, Tailwind)
+ ├── public/        # Static assets
+ ├── middleware.ts  # Edge functions and middleware
+```
 
-To learn more about Next.js, take a look at the following resources:
+📖 Learn more about Next.js 15:
+- [Next.js 15 Features](https://nextjs.org/blog/next-15)
+- [Partial Prerendering Explained](https://nextjs.org/docs/advanced-features/partial-prerendering)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🛠️ Setup
 
-## Deploy on Vercel
+### 1️⃣ Install **Deno 2.0**
+#### 🖥️ Windows
+Run the following command in PowerShell:
+```powershell
+irm https://deno.land/install.ps1 | iex
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+#### 🐧 macOS & Linux
+Follow the official Deno installation guide: [Deno Docs](https://docs.deno.com/runtime/getting_started/installation/)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+## 📦 Install Dependencies
+Run:
+```sh
+deno install
+```
+
+---
+
+## ▶️ Run the App
+Start the application with:
+```sh
+deno run dev
+```
+
+---
+
+## 🤝 Contributing
+1. Fork the repository 🍴
+2. Create a new branch 🌱
+3. Commit your changes 📌
+4. Submit a pull request 🔄
+
+---
+
+### 💡 Stay Connected
+📧 Contact us for inquiries and collaborations!
+
