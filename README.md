@@ -1,78 +1,36 @@
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Getting Started
 
-## Project Structure
+First, run the development server:
 
-```
-C:.
-├───client
-│   ├───public
-│   └───src
-│       └───components
-├───docs
-│   ├───cert
-│   └───mock
-└───server
-    ├───lib
-    ├───src
-    └───test
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
 ```
 
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-## Development
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-### Prerequisites
-- Install `Docker`
-- Install `Visual Studio Code` 
-- Enable `Prettier` extension for client
-- Disable `Prettier` extension for server
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-### Environment
+## Learn More
 
-Navigate to the project's root directory
-```
-cd CRAFT
-```
+To learn more about Next.js, take a look at the following resources:
 
-<hr>
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-> The command in this section clears existing cache, should only be run once 
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-Setup containers
-```
-docker compose down
-docker system prune --all
-docker volume remove craft_server_modules
-docker volume remove craft_client_modules
-docker compose up --build --force-recreate
-```
+## Deploy on Vercel
 
-<hr>
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-> These commands can be run anytime after the previous section
-
-
-Create containers
-```
-docker compose up
-```
-
-```
-Client: http://localhost:5000
-Server: http://localhost:5010
-```
-
-Remove containers
-```
-docker compose down
-```
-
-Check the status
-```
-docker compose ps
-```
-
-Adding custom packages to Client or Server (target service should be up)
-```
-docker compose exec client pnpm install <package>
-docker compose exec server pnpm install <package>
-```
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
