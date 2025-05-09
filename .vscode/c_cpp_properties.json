@@ -1,0 +1,18 @@
+// This file is used to configure IntelliSense for CMake projects
+
+{
+  "configurations": [
+    {
+      "name": "Linux",  // or "Win32", "Mac" depending on your OS
+      "compileCommands": "${workspaceFolder}/engine/build/compile_commands.json", // Path to your compile_commands.json
+      "includePath": [
+          "${workspaceFolder}/**", // Include all files in the workspace
+          "${workspaceFolder}/engine/or-tools/include", // Add your OR-Tools include path here
+          "${workspaceFolder}/engine/include" // Add your engine include path here
+      ],
+      "intelliSenseMode": "gcc-x64",  // or "clang-x64", "msvc-x64"
+      "configurationProvider": "ms-vscode.cmake-tools" // This is needed for CMake Tools extension
+    }
+  ],
+  "version": 4
+}
