@@ -1,87 +1,116 @@
-# 🚀 OptiMake
+# 🎓 Optimake
 
-### 📌 Web-Based Decision Support System for University Course Scheduling
-Leverages **Constraint Programming** with **Google's OR-Tools CP-SAT Model** to optimize course scheduling efficiently.
+## 📊 University Course Scheduling Optimization System
 
----
+> **Optimake** is a powerful web-based platform that leverages **Constraint Programming** to solve complex university course scheduling challenges efficiently.
 
-## 🛠️ Setup
-
-### 1️⃣ Install **Deno 2.0**
-#### 🖥️ Windows
-Run the following command in PowerShell:
-```powershell
-irm https://deno.land/install.ps1 | iex
-```
-
-#### 🐧 macOS & Linux
-Follow the official Deno installation guide: [Deno Docs](https://docs.deno.com/runtime/getting_started/installation/)
+![Version](https://img.shields.io/badge/status-active-success.svg)
 
 ---
 
-## 📦 Install Dependencies
-Run:
-```sh
-deno install
+## ✨ Features
+
+- 🧩 **Constraint-Based Scheduling** - Advanced algorithms for conflict-free schedules
+- 🌐 **Web-Based Interface** - Accessible from anywhere, on any device
+- ⚡ **High-Performance Backend** - C++ optimization engine for lightning-fast results
+- 📱 **Responsive Design** - Works seamlessly on desktop and mobile
+- 🔒 **Secure Authentication** - Protected access to scheduling resources
+
+---
+
+## 🛠️ Installation & Setup
+
+### Prerequisites
+
+- Ubuntu 24.04 or WSL2
+- Node.js v23+
+- pnpm package manager
+
+### Web Application Setup
+
+```bash
+# Install pnpm globally
+npm install -g pnpm
+
+# Install dependencies
+pnpm install
+```
+
+### Optimization Engine Setup
+
+```bash
+# Install required system packages
+sudo apt update
+sudo apt install -y build-essential cmake lsb-release
+
+# Set up and build the engine
+pnpm run engine-setup-ubuntu24.04
+pnpm run engine-build
+pnpm run engine-compile
+```
+
+> ⚠️ **Note**: The optimization engine is proprietary and linked to a private repository.
+
+---
+
+## 🚀 Running the Application
+
+```bash
+# Development mode
+pnpm run dev
+
+# Production build
+pnpm run build
+pnpm run start
 ```
 
 ---
 
-## ▶️ Run the App
-Start the application with:
-```sh
-deno run dev
-```
+## 🏗️ Architecture
+
+- **Frontend**: Next.js React framework
+- **Backend**: Node.js with Express
+- **Scheduling Engine**: C++ with Google OR-Tools CP-SAT solver
+- **Authentication**: Firebase Authentication
+- **Database**: Firestore
+- **Deployment**: Cloud Run with Docker containerization
 
 ---
 
 ## 🤝 Contributing
-1. Fork the repository 🍴
-2. Create a new branch 🌱
-3. Commit your changes 📌
-4. Submit a pull request 🔄
+
+Contributions are welcome! Please feel free to submit:
+
+- 🐛 Bug reports
+- ✅ Feature requests
+- 📝 Documentation improvements
+
+Submit issues through our issue tracker or contact the development team.
 
 ---
 
-## 🏗️ Next.js 15 Project Structure
+## 📄 License
 
-This project follows an **Atomic Project Structure Design**, ensuring modularity and maintainability.
+Proprietary software - All rights reserved.
 
-OptiMake is built with **Next.js 15**, which introduces **Partial Prerendering (PPR)** and improved React Server Components (RSC). The project structure follows Next.js' latest best practices:
-
-## 📂 Folder Organization (Next.js 15)
-
-```
-/src
- ├── app/            # Uses Next.js App Router (new feature)
- │   ├── layout.tsx  # Defines shared layouts
- │   ├── page.tsx    # Default homepage
- │   ├── loading.tsx # Suspense loading state
- │   ├── error.tsx   # Error handling page
- │   ├── dashboard/  # Nested routes for dashboard
- ├── components/     # Reusable UI components
- ├── hooks/          # Custom React hooks
- ├── lib/            # Server utilities (database, authentication, API clients)
- ├── types/          # TypeScript type definitions and interfaces
- ├── utils/          # Helper functions and utilities
- ├── store/          # Global state management (Zustand, Redux, or Context API)
- ├── styles/         # Global styles (CSS, Tailwind)
- ├── public/         # Static assets
- ├── middleware.ts   # Edge functions and middleware
-```
-
-## 📖 Learn More
-
-### Next.js 15 Features
-- [Next.js 15 Official Blog](https://nextjs.org/blog/next-15)
-- [Partial Prerendering Explained](https://nextjs.org/docs/advanced-features/partial-prerendering)
-
-### Atomic Project Structure
-- [Atomic Design Principles](https://bradfrost.com/blog/post/atomic-web-design/)
-- [Organizing React Projects](https://react.dev/learn#organizing-components)
-  
 ---
 
-### 💡 Stay Connected
-📧 Contact us for inquiries and collaborations!
+## 🔧 Tech Stack
 
+- **Frontend**: Next.js, React, TailwindCSS
+- **Backend**: Node.js, Express
+- **Database**: Firestore
+- **Authentication**: Firebase Authentication
+- **Optimization**: Google OR-Tools CP-SAT
+- **Deployment**: Docker, Cloud Run
+- **Build Tools**: CMake, pnpm
+
+---
+
+## 📞 Support
+
+For support or inquiries, please open an issue or contact the development team.
+
+---
+
+*Made with ❤️ for educational institutions worldwide*
