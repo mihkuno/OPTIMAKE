@@ -6,7 +6,13 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+
+    "engine-cleanup": "rm -rf ./engine/build ./engine/or-tools*",
+    "engine-setup-ubuntu24.04": "cd ./engine && wget https://github.com/google/or-tools/releases/download/v9.12/or-tools_amd64_ubuntu-24.04_cpp_v9.12.4544.tar.gz -O tmp.tar.gz && tar -xvzf tmp.tar.gz && mv or-tools* or-tools && rm tmp.tar.gz",
+    "engine-build": "cd ./engine && cmake -S ./ -B ./build",
+    "engine-compile": "cd ./engine && cmake --build ./build",
+    "engine-execute": "cd ./engine && ./build/main"
   },
   "dependencies": {
     "react": "^19.0.0",
