@@ -1,230 +1,414 @@
-'use client';
-import { useState } from 'react';
+// app/page.js
+"use client";
 
-// Define constants for readability
-const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
-const HOUR_LABELS = Array.from({ length: 24 }, (_, i) => 
-  `${i.toString().padStart(2, '0')}:00`
-);
-const COURSE_NAMES = ['Mathematics', 'Physics', 'Chemistry'];
-const ROOM_NAMES = ['Lab A', 'Lab B', 'Lab C'];
-const SECTION_NAMES = ['Section 1', 'Section 2', 'Section 3'];
+import { useState, useEffect } from "react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
+import Timetable from "@/components/timetable"; // Assuming the Timetable component is in this path
 
-// Sample schedule data
-const scheduleData = [
-  { course: 0, day: 0, end_time: 21, room: 1, section: 0, start_time: 18 },
-  { course: 1, day: 1, end_time: 10, room: 1, section: 0, start_time: 7 },
-  { course: 2, day: 0, end_time: 10, room: 1, section: 0, start_time: 7 },
-  { course: 0, day: 1, end_time: 21, room: 2, section: 1, start_time: 18 },
-  { course: 1, day: 0, end_time: 10, room: 2, section: 1, start_time: 7 },
-  { course: 2, day: 1, end_time: 10, room: 2, section: 1, start_time: 7 },
-  { course: 0, day: 1, end_time: 21, room: 0, section: 2, start_time: 18 },
-  { course: 1, day: 1, end_time: 10, room: 0, section: 2, start_time: 7 },
-  { course: 2, day: 0, end_time: 10, room: 0, section: 2, start_time: 7 }
-];
+export default function Home() {
+    // State for all inputs
+    const [numSections, setNumSections] = useState(2);
+    const [numCourses, setNumCourses] = useState(3);
+    const [numRooms, setNumRooms] = useState(2);
+    const [weekdays, setWeekdays] = useState([0, 1, 2, 3, 4, 5]);
+    const [courses, setCourses] = useState([
+        { name: "CS101", duration: 1, apparatus: 1 },
+        { name: "CS102", duration: 2, apparatus: 1 },
+        { name: "CS103", duration: 1, apparatus: 2 },
+    ]);
+    const [rooms, setRooms] = useState([
+        { name: "Room A", apparatus: 1 },
+        { name: "Room B", apparatus: 3 }, // Supports both apparatus types
+    ]);
+    const [sectionCourses, setSectionCourses] = useState([
+        [0, 1], // Section 1 takes courses at index 0 and 1
+        [1, 2], // Section 2 takes courses at index 1 and 2
+    ]);
 
-// Helper function to get background color based on course
-const getCourseColor = (courseId) => {
-  const colors = ['bg-blue-100', 'bg-green-100', 'bg-purple-100'];
-  return colors[courseId % colors.length];
-};
+    // State for results
+    const [timetable, setTimetable] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [activeView, setActiveView] = useState("section");
 
-export default function Timetable() {
-  const [viewMode, setViewMode] = useState('course');
-  const [selectedId, setSelectedId] = useState(0);
-  
-  // Get unique items for each view mode
-  const uniqueCourses = [...new Set(scheduleData.map(item => item.course))];
-  const uniqueRooms = [...new Set(scheduleData.map(item => item.room))];
-  const uniqueSections = [...new Set(scheduleData.map(item => item.section))];
-  
-  // Filter schedule based on current view
-  const getFilteredSchedule = () => {
-    switch (viewMode) {
-      case 'course':
-        return scheduleData.filter(item => item.course === selectedId);
-      case 'room':
-        return scheduleData.filter(item => item.room === selectedId);
-      case 'section':
-        return scheduleData.filter(item => item.section === selectedId);
-      default:
-        return scheduleData;
-    }
-  };
-  
-  // Get appropriate label based on current view mode
-  const getItemName = (id) => {
-    switch (viewMode) {
-      case 'course':
-        return COURSE_NAMES[id];
-      case 'room':
-        return ROOM_NAMES[id];
-      case 'section':
-        return SECTION_NAMES[id];
-      default:
-        return '';
-    }
-  };
-  
-  // Get appropriate selector items
-  const getSelectorItems = () => {
-    switch (viewMode) {
-      case 'course':
-        return uniqueCourses.map(id => ({ id, name: COURSE_NAMES[id] }));
-      case 'room':
-        return uniqueRooms.map(id => ({ id, name: ROOM_NAMES[id] }));
-      case 'section':
-        return uniqueSections.map(id => ({ id, name: SECTION_NAMES[id] }));
-      default:
-        return [];
-    }
-  };
+    // Derived state for names
+    const [courseNames, setCourseNames] = useState([]);
+    const [roomNames, setRoomNames] = useState([]);
+    const [sectionNames, setSectionNames] = useState([]);
 
-  // Determine the time range to display
-  const timeRange = {
-    start: 7, // Start at 7:00
-    end: 22,  // End at 22:00
-  };
-  
-  const filteredSchedule = getFilteredSchedule();
-  const selectorItems = getSelectorItems();
-  
-  // Calculate hours to display
-  const hoursToDisplay = Array.from(
-    { length: timeRange.end - timeRange.start }, 
-    (_, i) => i + timeRange.start
-  );
+    // Update derived course names when courses change
+    useEffect(() => {
+        setCourseNames(courses.map(c => c.name));
+    }, [courses]);
 
-  // Function to render a schedule item
-  const renderScheduleItem = (item) => {
-    const dayIndex = item.day;
-    const startHour = item.start_time - timeRange.start;
-    const duration = item.end_time - item.start_time;
-    const courseName = COURSE_NAMES[item.course];
-    const roomName = ROOM_NAMES[item.room];
-    const sectionName = SECTION_NAMES[item.section];
-    
+    // Update derived room names when rooms change
+    useEffect(() => {
+        setRoomNames(rooms.map(r => r.name));
+    }, [rooms]);
+
+    // Update derived section names when numSections changes
+    useEffect(() => {
+        setSectionNames(Array.from({ length: numSections }, (_, i) => `Section ${i + 1}`));
+    }, [numSections]);
+
+    // Update section courses when number of sections changes
+    const updateNumSections = (num) => {
+        const newNum = parseInt(num);
+        if (newNum > 0) {
+            setNumSections(newNum);
+
+            // Update sectionCourses array size
+            const newSectionCourses = [...sectionCourses];
+            if (newNum > sectionCourses.length) {
+                // Add new sections with empty course lists
+                for (let i = sectionCourses.length; i < newNum; i++) {
+                    newSectionCourses.push([]);
+                }
+            } else {
+                // Remove excess sections
+                newSectionCourses.splice(newNum);
+            }
+            setSectionCourses(newSectionCourses);
+        }
+    };
+
+    // Update courses when number of courses changes
+    const updateNumCourses = (num) => {
+        const newNum = parseInt(num);
+        if (newNum > 0) {
+            setNumCourses(newNum);
+
+            // Update courses array size
+            const newCourses = [...courses];
+            if (newNum > courses.length) {
+                // Add new courses
+                for (let i = courses.length; i < newNum; i++) {
+                    newCourses.push({ name: `Course ${i + 1}`, duration: 1, apparatus: 1 });
+                }
+            } else {
+                // Remove excess courses
+                newCourses.splice(newNum);
+
+                // Also remove deleted courses from sectionCourses
+                const newSectionCourses = sectionCourses.map(section =>
+                    section.filter(courseIndex => courseIndex < newNum)
+                );
+                setSectionCourses(newSectionCourses);
+            }
+            setCourses(newCourses);
+        }
+    };
+
+    // Update rooms when number of rooms changes
+    const updateNumRooms = (num) => {
+        const newNum = parseInt(num);
+        if (newNum > 0) {
+            setNumRooms(newNum);
+
+            // Update rooms array size
+            const newRooms = [...rooms];
+            if (newNum > rooms.length) {
+                // Add new rooms
+                for (let i = rooms.length; i < newNum; i++) {
+                    newRooms.push({ name: `Room ${i + 1}`, apparatus: 1 });
+                }
+            } else {
+                // Remove excess rooms
+                newRooms.splice(newNum);
+            }
+            setRooms(newRooms);
+        }
+    };
+
+    // Helper to update course properties
+    const updateCourse = (index, field, value) => {
+        const newCourses = [...courses];
+        if (field === "duration" || field === "apparatus") {
+            newCourses[index][field] = parseInt(value);
+        } else {
+            newCourses[index][field] = value;
+        }
+        setCourses(newCourses);
+    };
+
+    // Helper to update room properties
+    const updateRoom = (index, field, value) => {
+        const newRooms = [...rooms];
+        if (field === "apparatus") {
+            newRooms[index][field] = parseInt(value);
+        } else {
+            newRooms[index][field] = value;
+        }
+        setRooms(newRooms);
+    };
+
+    // Toggle course assignment to a section using index
+    const toggleCourseForSection = (sectionIndex, courseIndex) => {
+        const newSectionCourses = [...sectionCourses];
+
+        if (newSectionCourses[sectionIndex].includes(courseIndex)) {
+            // Remove course from section
+            newSectionCourses[sectionIndex] = newSectionCourses[sectionIndex].filter(id => id !== courseIndex);
+        } else {
+            // Add course to section
+            newSectionCourses[sectionIndex].push(courseIndex);
+        }
+
+        setSectionCourses(newSectionCourses);
+    };
+
+    // Toggle weekday selection
+    const toggleWeekday = (day) => {
+        if (weekdays.includes(day)) {
+            setWeekdays(weekdays.filter(d => d !== day));
+        } else {
+            const newWeekdays = [...weekdays, day];
+            newWeekdays.sort((a, b) => a - b);
+            setWeekdays(newWeekdays);
+        }
+    };
+
+    const generateTimetable = async () => {
+        setLoading(true);
+
+        try {
+            // Prepare the input for the backend API
+            const inputData = {
+                weekdays: weekdays,
+                course_durations: courses.map(c => c.duration),
+                course_apparatus: courses.map(c => c.apparatus),
+                room_apparatus: rooms.map(r => r.apparatus),
+                section_courses: sectionCourses,
+                num_sections: numSections,
+                num_courses: numCourses,
+                num_rooms: numRooms,
+            };
+
+            // Send to backend API
+            const response = await fetch('/api/schedule', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(inputData),
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const result = await response.json();
+            setTimetable(result);
+            toast.success("Timetable generated successfully!");
+        } catch (error) {
+            console.error("Error generating timetable:", error);
+            toast.error("Failed to generate timetable. See console for details.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Convert day number to name
+    const getDayName = (day) => {
+        const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+        // Ensure day is within valid range
+        const index = Number(day);
+        return days[index];
+    };
+
     return (
-      <div 
-        key={`${item.course}-${item.day}-${item.start_time}`}
-        className={`absolute rounded-md p-2 border-l-4 border-blue-500 ${getCourseColor(item.course)}`}
-        style={{
-          top: `${(startHour / hoursToDisplay.length) * 100}%`,
-          height: `${(duration / hoursToDisplay.length) * 100}%`,
-          left: `${(dayIndex / DAYS.length) * 100}%`,
-          width: `${(1 / DAYS.length) * 100}%`
-        }}
-      >
-        <div className="text-xs font-semibold">{courseName}</div>
-        <div className="text-xs">Room: {roomName}</div>
-        <div className="text-xs">Section: {sectionName}</div>
-        <div className="text-xs">{item.start_time}:00 - {item.end_time}:00</div>
-      </div>
-    );
-  };
+        <main className="mx-auto p-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Input Form */}
+                <div className="space-y-6">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Basic Settings</CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            <div className="grid grid-cols-3 gap-4">
+                                <div>
+                                    <Label htmlFor="numSections">Number of Sections</Label>
+                                    <Input
+                                        id="numSections"
+                                        type="number"
+                                        min="1"
+                                        value={numSections}
+                                        onChange={(e) => updateNumSections(e.target.value)}
+                                    />
+                                </div>
+                                <div>
+                                    <Label htmlFor="numCourses">Number of Courses</Label>
+                                    <Input
+                                        id="numCourses"
+                                        type="number"
+                                        min="1"
+                                        value={numCourses}
+                                        onChange={(e) => updateNumCourses(e.target.value)}
+                                    />
+                                </div>
+                                <div>
+                                    <Label htmlFor="numRooms">Number of Rooms</Label>
+                                    <Input
+                                        id="numRooms"
+                                        type="number"
+                                        min="1"
+                                        value={numRooms}
+                                        onChange={(e) => updateNumRooms(e.target.value)}
+                                    />
+                                </div>
+                            </div>
 
-  return (
-    <div className="max-w-6xl mx-auto p-4 h-screen flex flex-col">
-      {/* Header with view mode toggles */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold mb-4">Class Timetable</h1>
-        
-        <div className="flex flex-col sm:flex-row gap-4 mb-4">
-          <div className="flex bg-gray-100 rounded-lg p-1">
-            {['course', 'room', 'section'].map((mode) => (
-              <button
-                key={mode}
-                onClick={() => {
-                  setViewMode(mode);
-                  setSelectedId(
-                    mode === 'course' ? uniqueCourses[0] :
-                    mode === 'room' ? uniqueRooms[0] : uniqueSections[0]
-                  );
-                }}
-                className={`px-4 py-2 rounded-md text-sm font-medium capitalize ${
-                  viewMode === mode
-                    ? 'bg-white shadow-sm'
-                    : 'text-gray-500 hover:text-gray-700'
-                }`}
-              >
-                {mode}
-              </button>
-            ))}
-          </div>
-          
-          <div className="flex bg-gray-100 rounded-lg p-1">
-            {selectorItems.map((item) => (
-              <button
-                key={item.id}
-                onClick={() => setSelectedId(item.id)}
-                className={`px-4 py-2 rounded-md text-sm font-medium ${
-                  selectedId === item.id
-                    ? 'bg-white shadow-sm'
-                    : 'text-gray-500 hover:text-gray-700'
-                }`}
-              >
-                {item.name}
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
-      
-      {/* Timetable grid */}
-      <div className="flex-1 flex flex-col">
-        {/* Day headers */}
-        <div className="flex border-b">
-          <div className="w-16 flex-shrink-0"></div>
-          {DAYS.map((day, index) => (
-            <div 
-              key={day}
-              className="flex-1 text-center py-2 font-medium"
-            >
-              {day}
-            </div>
-          ))}
-        </div>
-        
-        {/* Timetable content */}
-        <div className="flex-1 flex">
-          {/* Time labels */}
-          <div className="w-16 flex-shrink-0 border-r relative">
-            {hoursToDisplay.map((hour, index) => (
-              <div 
-                key={hour}
-                className="absolute text-xs text-gray-500"
-                style={{ top: `${(index / hoursToDisplay.length) * 100}%`, right: '8px' }}
-              >
-                {hour}:00
-              </div>
-            ))}
-          </div>
-          
-          {/* Grid for schedule */}
-          <div className="flex-1 relative">
-            {/* Horizontal time lines */}
-            {hoursToDisplay.map((hour, index) => (
-              <div 
-                key={hour}
-                className="absolute w-full border-t border-gray-200"
-                style={{ top: `${(index / hoursToDisplay.length) * 100}%` }}
-              ></div>
-            ))}
-            
-            {/* Vertical day separators */}
-            {DAYS.map((day, index) => index > 0 && (
-              <div 
-                key={day}
-                className="absolute h-full border-l border-gray-200"
-                style={{ left: `${(index / DAYS.length) * 100}%` }}
-              ></div>
-            ))}
-            
-            {/* Schedule items */}
-            {filteredSchedule.map(renderScheduleItem)}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+                            <div>
+                                <Label>Weekdays</Label>
+                                <div className="flex flex-wrap gap-2 mt-2">
+                                    {[0, 1, 2, 3, 4, 5].map(day => (
+                                        <Button
+                                            key={day}
+                                            variant={weekdays.includes(day) ? "default" : "outline"}
+                                            size="sm"
+                                            onClick={() => toggleWeekday(day)}
+                                        >
+                                            {getDayName(day)}
+                                        </Button>
+                                    ))}
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Courses</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="space-y-4">
+                                {courses.map((course, index) => (
+                                    <div key={index} className="grid grid-cols-3 gap-2 items-center">
+                                        <div>
+                                            <Label>Name</Label>
+                                            <Input
+                                                value={course.name}
+                                                onChange={(e) => updateCourse(index, "name", e.target.value)}
+                                            />
+                                        </div>
+                                        <div>
+                                            <Label>Duration</Label>
+                                            <Input
+                                                type="number"
+                                                min="1"
+                                                value={course.duration}
+                                                onChange={(e) => updateCourse(index, "duration", e.target.value)}
+                                            />
+                                        </div>
+                                        <div>
+                                            <Label>Apparatus</Label>
+                                            <Input
+                                                type="number"
+                                                min="1"
+                                                value={course.apparatus}
+                                                onChange={(e) => updateCourse(index, "apparatus", e.target.value)}
+                                            />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Rooms</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="space-y-4">
+                                {rooms.map((room, index) => (
+                                    <div key={index} className="grid grid-cols-2 gap-2 items-center">
+                                        <div>
+                                            <Label>Name</Label>
+                                            <Input
+                                                value={room.name}
+                                                onChange={(e) => updateRoom(index, "name", e.target.value)}
+                                            />
+                                        </div>
+                                        <div>
+                                            <Label>Apparatus</Label>
+                                            <Input
+                                                type="number"
+                                                min="1"
+                                                value={room.apparatus}
+                                                onChange={(e) => updateRoom(index, "apparatus", e.target.value)}
+                                            />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Section Courses</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="space-y-4">
+                                {Array.from({ length: numSections }).map((_, sectionIndex) => (
+                                    <div key={sectionIndex} className="border p-4 rounded-md">
+                                        <Label className="mb-2 block">Section {sectionIndex + 1} Courses</Label>
+                                        <div className="flex flex-wrap gap-2">
+                                            {courses.map((course, courseIndex) => (
+                                                <Button
+                                                    key={courseIndex}
+                                                    variant={sectionCourses[sectionIndex]?.includes(courseIndex) ? "default" : "outline"}
+                                                    size="sm"
+                                                    onClick={() => toggleCourseForSection(sectionIndex, courseIndex)}
+                                                >
+                                                    {course.name}
+                                                </Button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    <Button
+                        onClick={generateTimetable}
+                        className="w-full"
+                        disabled={loading}
+                    >
+                        {loading ? "Generating..." : "Generate Timetable"}
+                    </Button>
+                </div>
+
+                {/* Timetable Display */}
+                <div>
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Timetable</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            {timetable ? (
+                                <Timetable
+                                    scheduleData={timetable.schedule}
+                                    COURSE_NAMES={courseNames}
+                                    ROOM_NAMES={roomNames}
+                                    SECTION_NAMES={sectionNames}
+                                />
+                            ) : (
+                                <div className="text-center p-8 text-gray-500">
+                                    <p>Generated timetable will appear here</p>
+                                </div>
+                            )}
+                        </CardContent>
+                    </Card>
+                </div >
+            </div >
+        </main >
+    );
 }
